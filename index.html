@@ -307,147 +307,162 @@
     }
 
     .header{
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-      border-bottom: 2px solid #111;
-      padding-bottom: 8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      margin-bottom: 4mm;
     }
     .header .no{
-      font-size: 11pt;
+      font-size: 12px;
       font-weight: 700;
     }
     .header .title{
-      font-size: 20pt;
-      font-weight: 900;
-      letter-spacing: 4px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 6px;
     }
     .header .date{
-      font-size: 11pt;
-      font-weight: 700;
       text-align: right;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .top-block{
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
+      margin-top: 4mm;
+      display: grid;
+      grid-template-columns: 1fr 68mm;
+      gap: 10mm;
+      align-items: start;
     }
     .to{
-      flex: 1;
+      padding-top: 2mm;
     }
     .to-name{
-      font-size: 14pt;
-      font-weight: 700;
-      border-bottom: 1px solid #111;
-      padding-bottom: 4px;
-      margin-bottom: 8px;
+      font-size: 21px;
+      font-weight: 800;
+      display: inline-block;
+      padding-bottom: 2mm;
+      border-bottom: 1px solid #333;
+      min-width: 115mm;
     }
 
     .issuer{
-      text-align: right;
+      border: 1px solid #333;
+      padding: 4mm 4mm 3mm 4mm;
+      box-sizing: border-box;
+      font-size: 11px;
       position: relative;
-      padding-right: 10px;
     }
     .seiken-stamp{
-      position: absolute;
-      top: -10px;
-      right: 0;
-      width: 80px;
+      display: block;
+      width: 58mm;
       height: auto;
+      margin-bottom: 3mm;
     }
     .issuer-text{
-      font-size: 9pt;
-      line-height: 1.6;
-      padding-right: 90px;
+      /* 会社情報テキスト */
     }
-    .issuer-text .rowline{
+    .issuer .rowline{
       display: flex;
-      gap: 4px;
+      gap: 3px;
+      white-space: nowrap;
+      margin: 0.8mm 0;
     }
-    .issuer-text .k{
+    .issuer .k{
+      width: 10mm;
       font-weight: 700;
-      min-width: 40px;
     }
-    .issuer-text .v{
+    .issuer .v{
       flex: 1;
+      white-space: normal;
     }
 
     .greeting{
-      font-size: 11pt;
-      margin-bottom: 10px;
+      margin-top: 4mm;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .summary{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding: 8px 12px;
-      background: #f8f8f8;
-      border: 2px solid #111;
-      border-radius: 4px;
+      margin-top: 2mm;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+      border-top: 1px solid #333;
+      border-bottom: 1px solid #333;
+      padding: 2.5mm 0;
     }
     .sum-label{
-      font-size: 12pt;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 900;
     }
     .sum-amount{
-      font-size: 16pt;
+      text-align: right;
+      font-size: 22px;
       font-weight: 900;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
     }
 
     table.cond{
-      width: 100%;
+      margin-top: 4mm;
+      border: 1px solid #333;
       border-collapse: collapse;
-      margin-bottom: 12px;
-      font-size: 10pt;
+      width: 100%;
+      font-size: 12px;
     }
     table.cond td{
-      border: 1px solid #999;
-      padding: 4px 6px;
+      border: 1px solid #333;
+      padding: 2.2mm;
+      vertical-align: middle;
     }
-    table.cond .k, table.cond .k2{
-      background: #e8e8e8;
-      font-weight: 700;
-      width: 18%;
+    table.cond .k{
+      width: 18mm;
+      font-weight: 800;
+      background: #f7f7f7;
     }
     table.cond .v{
-      width: 32%;
+      width: 60mm;
+    }
+    table.cond .k2{
+      width: 22mm;
+      font-weight: 800;
+      background: #f7f7f7;
+    }
+    #outPlace{
+      white-space: pre-line;
     }
 
     table.items{
-      width: 100%;
+      margin-top: 4mm;
+      border: 1px solid #333;
       border-collapse: collapse;
-      margin-bottom: 12px;
-      font-size: 10pt;
+      width: 100%;
+      font-size: 12px;
     }
     table.items th, table.items td{
-      border: 1px solid #999;
-      padding: 4px 6px;
-      text-align: left;
+      border: 1px solid #333;
+      padding: 2.1mm;
     }
     table.items th{
-      background: #111;
-      color: #fff;
-      font-weight: 700;
-    }
-    table.items .desc{
-      width: 50%;
+      background: #f7f7f7;
+      font-weight: 900;
     }
     table.items .c-qty{
-      width: 10%;
+      width: 12mm;
       text-align: center;
     }
     table.items .c-unit{
-      width: 20%;
+      width: 28mm;
       text-align: right;
     }
     table.items .c-amt{
-      width: 20%;
+      width: 28mm;
       text-align: right;
+    }
+    table.items .desc{
+      width: auto;
     }
 
     .section-subtotal{
@@ -456,54 +471,55 @@
     }
 
     .bottom{
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+      margin-top: 4mm;
+      display: grid;
+      grid-template-columns: 1fr 70mm;
+      gap: 6mm;
+      align-items: start;
     }
     .note-box{
-      flex: 1;
-      border: 1px solid #999;
-      padding: 8px;
-      min-height: 60px;
-      font-size: 9pt;
+      border: 1px solid #333;
+      min-height: 36mm;
+      padding: 2.5mm;
+      box-sizing: border-box;
+      font-size: 12px;
       white-space: pre-wrap;
     }
     table.totals{
+      border: 1px solid #333;
       border-collapse: collapse;
-      font-size: 11pt;
+      width: 100%;
+      font-size: 12px;
     }
     table.totals td{
-      border: 1px solid #999;
-      padding: 6px 10px;
+      border: 1px solid #333;
+      padding: 2.2mm;
     }
     table.totals .k{
-      background: #e8e8e8;
-      font-weight: 700;
-      width: 80px;
+      width: 18mm;
+      font-weight: 800;
+      background: #f7f7f7;
       text-align: center;
     }
     table.totals .v{
       text-align: right;
-      width: 120px;
-      font-weight: 700;
+      font-variant-numeric: tabular-nums;
     }
 
     .caution{
-      font-size: 8pt;
-      border-top: 1px solid #999;
-      padding-top: 8px;
+      margin-top: 4mm;
+      font-size: 11px;
     }
     .caution .head{
-      font-weight: 700;
-      margin-bottom: 4px;
+      font-weight: 800;
+      margin-bottom: 2mm;
     }
     .caution ul{
       margin: 0;
-      padding-left: 20px;
+      padding-left: 18px;
     }
     .caution li{
-      margin-bottom: 2px;
+      margin-bottom: 1mm;
     }
 
     .terms-section{
@@ -760,7 +776,10 @@
 <div class="to-name" id="outTo">株式会社　＿＿＿＿　御中</div>
 </div>
 <div class="issuer">
+  <!-- ロゴ＋印鑑 -->
   <img src="seiken-stamp.png" class="seiken-stamp" alt="株式会社精研 印影">
+
+  <!-- 会社情報 -->
   <div class="issuer-text">
     <div class="rowline"><div class="k">〒</div><div class="v">573-0102</div></div>
     <div class="rowline"><div class="k"></div><div class="v">大阪府枚方市長尾家具町3-12-3</div></div>
