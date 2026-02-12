@@ -2036,7 +2036,7 @@
     applyAndRender();
   }
 
-  async function saveAsPDF(){
+    async function saveAsPDF(){
     const seidNo = document.getElementById('seidNo').value.trim();
     if(!seidNo){
       alert('SEID番号を採番してから保存してください。');
@@ -2045,50 +2045,26 @@
 
     const customer = document.getElementById('toBase').value.trim() || '顧客名未入力';
     const quoteNo = document.getElementById('quoteNo').value.trim() || 'DGNET';
-    
-    const fileName = `${seidNo}_${quoteNo}_${customer.replace(/[\\/:*?"<>|]/g,'-')}`;
+    const safeCustomer = customer.replace(/[\\/:*?"<>|]/g,'-');
+    const fileName = `${seidNo}_${quoteNo}_${safeCustomer}`;
+
+    // テキストPDF（ブラウザのPDF保存）で出力する：
+    // 画像化（html2canvas/jsPDF）は使わず、印刷エンジンに任せることで
+    // 文字選択できるPDFになり、容量も軽くなります。
+    const prevTitle = document.title;
 
     document.body.classList.add('pdf-mode');
-    
-    try {
-      const paper = document.getElementById('paper');
-      const canvas = await html2canvas(paper, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
+    document.title = fileName;
 
-      const imgData = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      if(imgHeight <= pdfHeight){
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      } else {
-        let heightLeft = imgHeight;
-        let position = 0;
-        
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
-        
-        while(heightLeft > 0){
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pdfHeight;
-        }
-      }
-
-      pdf.save(`${fileName}.pdf`);
-    } finally {
+    const cleanup = () => {
+      document.title = prevTitle;
       document.body.classList.remove('pdf-mode');
-    }
+    };
+
+    window.addEventListener('afterprint', cleanup, { once:true });
+
+    // ここで「PDFに保存」を選択して保存してください（Windows/Chrome/Edge）
+    window.print();
   }
 
   function printQuote(){
