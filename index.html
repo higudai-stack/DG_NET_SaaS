@@ -8,8 +8,9 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <title>精研 DG.NET.SaaS 見積もり</title>
-<script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<!-- ✅ 文書PDF生成用ライブラリ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <style>
     :root{
       --border:#333;
@@ -294,1533 +295,731 @@
     }
 
     .paper{
-      width: 210mm;
+      width: 100%;
       min-height: 297mm;
-      padding: 10mm 12mm;
-      margin: 0 auto;
       background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border: 1px solid #ddd;
+      padding: 16px 20px;
       box-sizing: border-box;
-      font-size: 11pt;
-      line-height: 1.5;
-      position: relative;
     }
 
-    .header{
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      align-items: center;
-      margin-bottom: 4mm;
+    .paper-head{
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #111;
     }
-    .header .no{
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .header .title{
-      text-align: center;
+
+    .paper-head-left h1{
       font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 6px;
+      font-weight: 900;
+      margin: 0 0 10px;
+      letter-spacing: 1px;
     }
-    .header .date{
-      text-align: right;
+    .paper-head-left p{
+      margin: 2px 0;
       font-size: 12px;
-      font-weight: 700;
+      color: #333;
     }
 
-    .top-block{
-      margin-top: 4mm;
-      display: grid;
-      grid-template-columns: 1fr 68mm;
-      gap: 10mm;
-      align-items: start;
+    .paper-head-right{
+      text-align: right;
+      font-size: 13px;
     }
-    .to{
-      padding-top: 2mm;
+    .paper-head-right p{
+      margin: 3px 0;
+    }
+
+    .to-section{
+      margin-bottom: 16px;
     }
     .to-name{
-      font-size: 21px;
-      font-weight: 800;
-      display: inline-block;
-      padding-bottom: 2mm;
-      border-bottom: 1px solid #333;
-      min-width: 115mm;
-    }
-
-    .issuer{
-      border: 1px solid #333;
-      padding: 4mm 4mm 3mm 4mm;
-      box-sizing: border-box;
-      font-size: 11px;
-      position: relative;
-    }
-    .seiken-stamp{
-      display: block;
-      width: 58mm;
-      height: auto;
-      margin-bottom: 3mm;
-    }
-    .issuer-text{
-      /* 会社情報テキスト */
-    }
-    .issuer .rowline{
-      display: flex;
-      gap: 3px;
-      white-space: nowrap;
-      margin: 0.8mm 0;
-    }
-    .issuer .k{
-      width: 10mm;
-      font-weight: 700;
-    }
-    .issuer .v{
-      flex: 1;
-      white-space: normal;
-    }
-
-    .greeting{
-      margin-top: 4mm;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .summary{
-      margin-top: 2mm;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: end;
-      border-top: 1px solid #333;
-      border-bottom: 1px solid #333;
-      padding: 2.5mm 0;
-    }
-    .sum-label{
-      font-size: 14px;
-      font-weight: 900;
-    }
-    .sum-amount{
-      text-align: right;
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    table.cond{
-      margin-top: 4mm;
-      border: 1px solid #333;
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 12px;
-    }
-    table.cond td{
-      border: 1px solid #333;
-      padding: 2.2mm;
-      vertical-align: middle;
-    }
-    table.cond .k{
-      width: 18mm;
-      font-weight: 800;
-      background: #f7f7f7;
-    }
-    table.cond .v{
-      width: 60mm;
-    }
-    table.cond .k2{
-      width: 22mm;
-      font-weight: 800;
-      background: #f7f7f7;
-    }
-    #outPlace{
-      white-space: pre-line;
-    }
-
-    table.items{
-      margin-top: 4mm;
-      border: 1px solid #333;
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 12px;
-    }
-    table.items th, table.items td{
-      border: 1px solid #333;
-      padding: 2.1mm;
-    }
-    table.items th{
-      background: #f7f7f7;
-      font-weight: 900;
-    }
-    table.items .c-qty{
-      width: 12mm;
-      text-align: center;
-    }
-    table.items .c-unit{
-      width: 28mm;
-      text-align: right;
-    }
-    table.items .c-amt{
-      width: 28mm;
-      text-align: right;
-    }
-    table.items .desc{
-      width: auto;
-    }
-
-    .section-subtotal{
-      background: #f0f0f0;
-      font-weight: 800;
-    }
-
-    .bottom{
-      margin-top: 4mm;
-      display: grid;
-      grid-template-columns: 1fr 70mm;
-      gap: 6mm;
-      align-items: start;
-    }
-    .note-box{
-      border: 1px solid #333;
-      min-height: 36mm;
-      padding: 2.5mm;
-      box-sizing: border-box;
-      font-size: 12px;
-      white-space: pre-wrap;
-    }
-    table.totals{
-      border: 1px solid #333;
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 12px;
-    }
-    table.totals td{
-      border: 1px solid #333;
-      padding: 2.2mm;
-    }
-    table.totals .k{
-      width: 18mm;
-      font-weight: 800;
-      background: #f7f7f7;
-      text-align: center;
-    }
-    table.totals .v{
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .caution{
-      margin-top: 4mm;
-      font-size: 11px;
-    }
-    .caution .head{
-      font-weight: 800;
-      margin-bottom: 2mm;
-    }
-    .caution ul{
-      margin: 0;
-      padding-left: 18px;
-    }
-    .caution li{
-      margin-bottom: 1mm;
-    }
-
-    .terms-section{
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px solid #999;
-      font-size: 8pt;
-      line-height: 1.4;
-    }
-    .terms-section .terms-head{
+      font-size: 18px;
       font-weight: 800;
       margin-bottom: 4px;
+    }
+    .to-addr{
+      font-size: 12px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .info-line{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      padding: 10px 0;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+    }
+    .info-line > div{
+      display: flex;
+      gap: 6px;
+    }
+    .info-line label{
+      font-weight: 800;
+      color: #111;
+    }
+    .info-line span{
+      color: #333;
+    }
+
+    table.quote-table{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    table.quote-table th,
+    table.quote-table td{
+      border: 1px solid #333;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    table.quote-table th{
+      background: #111;
+      color: #fff;
+      font-weight: 800;
+      text-align: center;
+    }
+    table.quote-table td.desc{
+      width: 50%;
+    }
+    table.quote-table td.c-qty{
+      text-align: center;
+      width: 10%;
+    }
+    table.quote-table td.c-unit,
+    table.quote-table td.c-amt{
+      text-align: right;
+      width: 20%;
+    }
+
+    table.quote-table tr.section-subtotal td{
+      background: #f5f5f5;
+      font-weight: 800;
+    }
+
+    table.quote-table tfoot td{
+      font-weight: 800;
+      background: #fafafa;
+    }
+
+    .notes-box{
+      border: 1px solid #ddd;
+      padding: 12px;
+      background: #fafafa;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin-top: 16px;
+    }
+
+    .footer-info{
+      margin-top: 16px;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .grand-total{
+      font-size: 24px;
+      font-weight: 900;
+      text-align: right;
+      margin: 16px 0;
+      color: #111;
     }
 </style>
 </head>
 <body>
 
-<div class="no-print">
-<div class="app-head">
+<div class="app-head no-print">
   <div>
     <div class="app-title">精研 DG.NET.SaaS 見積もり</div>
-    <div class="app-sub">DG.NET.SaaS専用見積作成アプリ</div>
+    <div class="app-sub">Phase 2 - 文書PDF対応版</div>
   </div>
 </div>
 
-<div class="toolbar">
-  <button class="btn primary" type="button" onclick="SetSEID()">次の番号（SEID採番）</button>
-  <button class="btn" type="button" onclick="saveAsPDF()">保存（PDF）</button>
-  <button class="btn" type="button" onclick="printQuote()">印刷</button>
-  <button class="btn" type="button" onclick="resetAll()">全リセット</button>
+<div class="toolbar no-print">
+  <button class="btn primary" onclick="getSEID()">📋 SEID採番</button>
+  <button class="btn primary" onclick="saveAsPDF()">💾 PDF保存</button>
+  <button class="btn" onclick="printQuote()">🖨️ 印刷</button>
+  <button class="btn mini" onclick="resetDGNetSection()">DG.NETリセット</button>
+  <button class="btn mini" onclick="resetBasicInfoSection()">基本情報リセット</button>
+  <button class="btn mini" onclick="resetAll()">全リセット</button>
 </div>
 
-<div class="card">
-  <div class="section-head">
-    <div class="opt-head">基本情報</div>
-    <button class="btn mini" type="button" onclick="resetBasicInfoSection()">この欄をリセット</button>
+<div class="card no-print">
+  <div style="margin-bottom:10px; font-weight:700;">基本情報</div>
+  <div class="grid">
+    <div class="row">
+      <label>SEID番号:</label>
+      <input type="text" id="seidNo" readonly placeholder="採番ボタンで取得"/>
+    </div>
+    <div class="row">
+      <label>発行日:</label>
+      <input type="date" id="issueDate" onchange="applyAndRender()"/>
+    </div>
   </div>
   <div class="grid">
-    <div>
-      <label>見積番号（お客様向け）</label>
-      <div style="display:flex; gap:8px; align-items:center">
-        <input type="text" id="seidNo" placeholder="例：SEID-0001" style="flex:1" oninput="applyAndRender()" />
-        <button class="btn" type="button" onclick="SetSEID()" style="white-space:nowrap; font-size:13px; padding:8px 12px">次の番号</button>
-      </div>
-      <div class="muted" style="margin-top:4px">SEID採番後に表示</div>
+    <div class="row">
+      <label>見積番号:</label>
+      <input type="text" id="quoteNo" oninput="quoteNoManuallyEdited=true; applyAndRender()"/>
     </div>
-    <div>
-      <label>発行日</label>
-      <input type="date" id="issueDate" onchange="applyAndRender()" />
-    </div>
-  </div>
-  
-  <div class="grid" style="margin-top:10px">
-    <div>
-      <label>管理番号（自動生成）</label>
-      <input type="text" id="quoteNo" placeholder="例：DH-DGNET-20260211-193503" oninput="quoteNoManuallyEdited=true; applyAndRender()" />
-      <div class="muted" style="margin-top:6px">形式：担当者-DGNET-日付-時刻</div>
-    </div>
-    <div></div>
-  </div>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <label>宛名（会社名等）</label>
-      <input type="text" id="toBase" placeholder="例：株式会社○○" oninput="applyAndRender()" />
-    </div>
-    <div style="width:120px">
-      <label>敬称</label>
-      <select id="toHonorific" onchange="applyAndRender()">
-        <option value="御中">御中</option>
-        <option value="様">様</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <label>担当者</label>
-      <select id="tantouSelect" onchange="onTantouChange()">
+    <div class="row">
+      <label>担当者:</label>
+      <select id="tantouSelect" onchange="applyAndRender()">
         <option value="">選択してください</option>
-        <option value="樋口大">樋口大</option>
-        <option value="巽隆充">巽隆充</option>
-        <option value="三谷剛史">三谷剛史</option>
-        <option value="山崎迅人">山崎迅人</option>
-        <option value="與那城昭彦">與那城昭彦</option>
-        <option value="八田雅隆">八田雅隆</option>
+        <option value="営業部 樋口">営業部 樋口</option>
+        <option value="営業部 田中">営業部 田中</option>
+        <option value="技術部 佐藤">技術部 佐藤</option>
       </select>
     </div>
   </div>
+  <div class="row">
+    <label>宛先:</label>
+    <input type="text" id="toBase" placeholder="株式会社〇〇" oninput="applyAndRender()"/>
+    <select id="toHonorific" onchange="applyAndRender()">
+      <option value="御中">御中</option>
+      <option value="様">様</option>
+      <option value="殿">殿</option>
+    </select>
+  </div>
+</div>
 
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <label>納期</label>
-      <input type="text" id="delivery" placeholder="例：受注後 約3カ月" oninput="applyAndRender()" />
+<div class="card no-print">
+  <details class="opt-panel" open>
+    <summary class="opt-head">DG.NET SaaS 基本パッケージ</summary>
+    <div style="margin:12px 0;">
+      <label style="display:block; margin-bottom:6px;">ベースパッケージ:</label>
+      <select id="dgnetBase" style="width:100%;" onchange="renderDGNetOptions(); applyAndRender();">
+        <option value="">選択してください</option>
+        <option value="standard">スタンダード (月額 28,000円)</option>
+        <option value="professional">プロフェッショナル (月額 38,000円)</option>
+        <option value="enterprise">エンタープライズ (月額 58,000円)</option>
+      </select>
+    </div>
+    <div id="dgnetOptionsContainer" style="margin-top:16px;"></div>
+  </details>
+</div>
+
+<div class="card no-print">
+  <details class="opt-panel">
+    <summary class="opt-head">DGソフトウェア追加オプション</summary>
+    <div id="dgSoftwareContainer" style="margin-top:12px;"></div>
+  </details>
+</div>
+
+<div class="card no-print">
+  <details class="opt-panel">
+    <summary class="opt-head">フリーフォーム項目（任意追加）</summary>
+    <div style="margin:12px 0;">
+      <button class="btn mini" onclick="addFreeformLine()">+ 項目追加</button>
+    </div>
+    <div id="freeformContainer"></div>
+  </details>
+</div>
+
+<div class="card no-print">
+  <div style="margin-bottom:10px; font-weight:700;">納期・支払条件・備考</div>
+  <div class="row" style="margin-bottom:8px;">
+    <label>納期:</label>
+    <input type="text" id="delivery" oninput="applyAndRender()"/>
+  </div>
+  <div class="grid">
+    <div class="row">
+      <label>郵便番号:</label>
+      <input type="text" id="zip" placeholder="000-0000" oninput="applyAndRender()"/>
+    </div>
+    <div class="row">
+      <label>都道府県:</label>
+      <input type="text" id="pref" placeholder="大阪府" oninput="applyAndRender()"/>
     </div>
   </div>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1; min-width:0">
-      <label>受渡場所（郵便番号）</label>
-      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center">
-        <input type="text" id="zip" placeholder="例：573-0102" style="flex:1; min-width:180px" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupZip();}" oninput="applyAndRender()" />
-        <button class="btn" type="button" onclick="lookupZip()" style="white-space:nowrap; font-size:14px; padding:10px 12px">住所自動入力</button>
-      </div>
-      <div class="muted" style="margin-top:4px">※町名まで自動入力。番地・建物名は下で手入力。Enterキーでも検索できます。</div>
+  <div class="grid">
+    <div class="row">
+      <label>市区町村:</label>
+      <input type="text" id="city" placeholder="枚方市" oninput="applyAndRender()"/>
     </div>
-    <div style="flex:1"></div>
-  </div>
-
-  <div class="row" style="margin-top:6px">
-    <div style="flex:1">
-      <label>都道府県</label>
-      <input type="text" id="pref" placeholder="例：大阪府" oninput="applyAndRender()" />
-    </div>
-    <div style="flex:1">
-      <label>市区町村</label>
-      <input type="text" id="city" placeholder="例：枚方市" oninput="applyAndRender()" />
+    <div class="row">
+      <label>町域:</label>
+      <input type="text" id="town" placeholder="〇〇町" oninput="applyAndRender()"/>
     </div>
   </div>
-
-  <div class="row" style="margin-top:6px">
-    <div style="flex:1">
-      <label>町域</label>
-      <input type="text" id="town" placeholder="例：長尾家具町" oninput="applyAndRender()" />
-    </div>
-    <div style="flex:1">
-      <label>番地・建物名（手入力）</label>
-      <input type="text" id="addr2" placeholder="例：3-12-3 ○○ビル2F" oninput="applyAndRender()" />
-    </div>
+  <div class="row" style="margin-bottom:8px;">
+    <label>番地・建物:</label>
+    <input type="text" id="addr2" placeholder="1-2-3 〇〇ビル4F" oninput="applyAndRender()"/>
   </div>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <label>支払条件</label>
-      <input type="text" id="payment" placeholder="例：納入時 現金一括払い" oninput="applyAndRender()" />
-    </div>
+  <div class="row" style="margin-bottom:8px;">
+    <label>支払条件:</label>
+    <input type="text" id="payment" oninput="applyAndRender()"/>
   </div>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <label>見積有効期限</label>
-      <input type="text" id="valid" placeholder="例：30日" oninput="applyAndRender()" />
-    </div>
+  <div class="row" style="margin-bottom:8px;">
+    <label>有効期限:</label>
+    <input type="text" id="valid" style="max-width:120px;" oninput="applyAndRender()"/>
   </div>
-
-  <div class="row" style="margin-top:10px">
-    <label>備考（御見積書下部に表示）</label>
+  <div>
+    <label style="display:block; margin-bottom:6px;">備考:</label>
     <textarea id="notes" oninput="applyAndRender()"></textarea>
   </div>
 </div>
 
-<div class="card">
-  <div class="section-head">
-    <div class="opt-head">刺繍ソフト（DG）</div>
-    <button class="btn mini" type="button" onclick="resetDGSoftwareSection()">刺繍ソフトをリセット</button>
-  </div>
-  <div class="row">
-    <div style="flex:1">
-      <label>DGグレード</label>
-      <select id="dgGrade" style="width:100%"></select>
-      <div class="muted" style="margin-top:6px">※ DG-Sは別枠扱い（オプション／フォントは選択不可）</div>
-    </div>
-    <div style="width:130px">
-      <label>数量</label>
-      <input type="number" id="dgQty" class="qty" min="1" step="1" value="1" oninput="applyAndRender()" />
-    </div>
-  </div>
-
-  <details class="opt-panel" id="dgOptPanel" style="margin-top:14px">
-    <summary class="opt-head" style="margin:0">DGオプション（グレード連動） <span class="muted" id="dgOptSummary"></span></summary>
-    <div class="opt-row off" id="dgopt_row_DG_LESSON" style="margin-top:10px">
-      <label class="switch">
-        <input type="checkbox" id="dgopt_DG_LESSON" onchange="toggleDGItem('dgopt','DG_LESSON')" />
-        <span class="slider"></span>
-      </label>
-      <div class="opt-label">DG講習費用</div>
-      <div style="margin-left:auto; display:flex; gap:10px; align-items:center">
-        <span style="color:#666; font-size:12px;">金額</span>
-        <input type="number" id="dgopt_DG_LESSON_price" min="0" step="1" value="0" style="width:130px; text-align:right" oninput="applyAndRender()" />
-        <input type="number" id="dgopt_DG_LESSON_qty" class="opt-qty" min="1" step="1" value="1" oninput="applyAndRender()" />
+<div class="print-area">
+  <div class="paper" id="paper">
+    <div class="paper-head">
+      <div class="paper-head-left">
+        <h1>御見積書</h1>
+        <p id="outToName">株式会社〇〇 御中</p>
+        <p id="outToAddr"></p>
+      </div>
+      <div class="paper-head-right">
+        <p><strong>見積番号:</strong> <span id="outQuoteNo">-</span></p>
+        <p><strong>発行日:</strong> <span id="outIssueDate">-</span></p>
+        <p><strong>SEID:</strong> <span id="outSEID">-</span></p>
+        <p><strong>担当者:</strong> <span id="outTantou">-</span></p>
       </div>
     </div>
-    <div class="opt-list" id="dgOptList" style="margin-top:10px"></div>
-  </details>
 
-  <details class="opt-panel" id="dgFontPanel" style="margin-top:14px">
-    <summary class="opt-head" style="margin:0">DGフォント（グレード連動） <span class="muted" id="dgFontSummary"></span></summary>
-    <div class="opt-list" id="dgFontList" style="margin-top:10px"></div>
-  </details>
+    <div class="grand-total">
+      <span id="outGrand">￥0 -</span>
+    </div>
 
-  <details class="opt-panel" id="dgLanPanel" style="margin-top:14px">
-    <summary class="opt-head" style="margin:0">LAN刺繍機ライセンス <span class="muted" id="dgLanSummary"></span></summary>
-    <div class="opt-list" id="dgLanList" style="margin-top:10px"></div>
-  </details>
-</div>
+    <div class="info-line">
+      <div><label>納期:</label><span id="outDelivery">-</span></div>
+      <div><label>支払条件:</label><span id="outPayment">-</span></div>
+      <div><label>有効期限:</label><span id="outValid">-</span></div>
+    </div>
 
-<div class="card">
-  <div class="section-head">
-    <div class="opt-head">DG.NET.SaaS サービス選択</div>
-    <button class="btn mini" type="button" onclick="resetDGNetSection()">この項目のみリセット</button>
+    <table class="quote-table">
+      <thead>
+        <tr>
+          <th>品名・仕様</th>
+          <th>数量</th>
+          <th>単価</th>
+          <th>金額</th>
+        </tr>
+      </thead>
+      <tbody id="quoteTableBody">
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="text-align:right;">小計</td>
+          <td id="outSub" style="text-align:right;">¥0</td>
+        </tr>
+        <tr>
+          <td colspan="3" style="text-align:right;">消費税(10%)</td>
+          <td id="outTax" style="text-align:right;">¥0</td>
+        </tr>
+        <tr>
+          <td colspan="3" style="text-align:right; font-size:16px;">合計</td>
+          <td id="outTotal" style="text-align:right; font-size:16px;">¥0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="notes-box" id="outNotes"></div>
+
+    <div class="footer-info">
+      <strong>株式会社精研</strong><br/>
+      〒000-0000 大阪府枚方市〇〇町1-2-3<br/>
+      TEL: 072-XXX-XXXX / FAX: 072-XXX-XXXX<br/>
+      Email: info@seiken.co.jp
+    </div>
   </div>
-  
-  <div class="row">
-    <label>サービスベース（いずれか1つを選択）</label>
-    <select id="dgnetBase" onchange="onDGNetBaseChange()">
-      <option value="">選択してください</option>
-      <option value="ONDEMAND">オンデマンド（¥274,000/年、ジョブ数6,000）</option>
-      <option value="PERSO1">パーソナライゼーション1（¥476,000/年、ジョブ数6,000）</option>
-      <option value="PERSO2">パーソナライゼーション2（¥916,000/年、ジョブ数18,000）</option>
-      <option value="PERSO3">パーソナライゼーション3（¥1,512,000/年、ジョブ数48,000）</option>
-      <option value="PERSO4">パーソナライゼーション4（¥2,134,000/年、ジョブ数120,000）</option>
-      <option value="PERSO5">パーソナライゼーション5（¥10,667,000/年、ジョブ数720,000）</option>
-    </select>
-  </div>
-
-  <details class="opt-panel" id="dgnetOptionsPanel" style="display:none;">
-    <summary class="opt-head">
-      オプション選択
-      <span class="muted" id="dgnetOptionsSummary"></span>
-    </summary>
-    <div class="opt-list" id="dgnetOptionsList" style="margin-top:10px;"></div>
-  </details>
-
-</div>
-
-<div class="card">
-  <div class="section-head">
-    <div class="opt-head">フリーフォーム明細（DG16など追加商品）</div>
-    <button class="btn mini" type="button" onclick="resetFreeform()">明細リセット</button>
-  </div>
-  <div id="freeformList"></div>
-  <div style="display:flex; gap:8px; margin-top:10px;">
-    <button class="btn" type="button" onclick="addFreeformProduct()">商品行を追加</button>
-    <button class="btn" type="button" onclick="addFreeformText()">テキスト行を追加</button>
-  </div>
-  <div class="muted" style="margin-top:8px;">
-    ※ DG16などの必須機器や追加商品をここに入力してください<br>
-    ※ 商品行：品名・数量・単価を入力（金額計算あり）<br>
-    ※ テキスト行：説明文のみ（金額計算なし）
-  </div>
-</div>
-
-</div>
-
-<div class="print-area">
-<div class="paper" id="paper">
-<div class="header">
-<div class="no" id="outNo">No.--MODEL----------</div>
-<div class="title">御 見 積 書</div>
-<div class="date" id="outDate">令和 -- 年 -- 月 -- 日</div>
-</div>
-<div class="top-block">
-<div class="to">
-<div class="to-name" id="outTo">株式会社　＿＿＿＿　御中</div>
-</div>
-<div class="issuer">
-  <!-- ロゴ＋印鑑 -->
-  <img src="seiken-stamp.png" class="seiken-stamp" alt="株式会社精研 印影">
-
-  <!-- 会社情報 -->
-  <div class="issuer-text">
-    <div class="rowline"><div class="k">〒</div><div class="v">573-0102</div></div>
-    <div class="rowline"><div class="k"></div><div class="v">大阪府枚方市長尾家具町3-12-3</div></div>
-    <div class="rowline"><div class="k">TEL</div><div class="v">072-856-8253</div></div>
-    <div class="rowline"><div class="k">FAX</div><div class="v">072-856-8254</div></div>
-    <div class="rowline"><div class="k">担当者</div><div class="v" id="outTantou"></div></div>
-  </div>
-</div>
-</div>
-<div class="greeting">下記の通り、御見積申し上げます。</div>
-<div class="summary">
-<div class="sum-label">総金額</div>
-<div class="sum-amount" id="outGrand">￥0 -</div>
-</div>
-<table class="cond">
-<tr>
-<td class="k">納期</td><td class="v" id="outDelivery">受注後 約3カ月</td>
-<td class="k2">受渡場所</td><td id="outPlace">御社ご指定場所</td>
-</tr>
-<tr>
-<td class="k">支払条件</td><td class="v" id="outPayment">納入時 現金一括払い</td>
-<td class="k2">見積有効期限</td><td id="outValid">30日</td>
-</tr>
-</table>
-<table class="items">
-<thead>
-<tr>
-<th class="desc">品名及び仕様</th>
-<th class="c-qty">数量</th>
-<th class="c-unit">単価</th>
-<th class="c-amt">金額</th>
-</tr>
-</thead>
-<tbody id="outItems"></tbody>
-</table>
-<div class="bottom">
-<div class="note-box" id="outNotes"></div>
-<table class="totals">
-<tr><td class="k">小計</td><td class="v" id="outSub">0</td></tr>
-<tr><td class="k">消費税</td><td class="v" id="outTax">0</td></tr>
-<tr><td class="k">合計</td><td class="v" id="outTotal">0</td></tr>
-</table>
-</div>
-<div class="caution">
-<div class="head">【注意事項】</div>
-<ul>
-<li>製品保証期間は納入日より1年間です。</li>
-</ul>
-</div>
-
-<div class="terms-section">
-<div class="terms-head">■規約と条件</div>
-<div>刺繡テンプレートの作成には、DGのエレメント機能が必要です。</div>
-<div>初期セットアップ料金には、プリントおよび彫刻用に1つのPVエディターが含まれます。</div>
-<div>追加料金は初期契約の終了期限に合わせて請求し、再契約する場合には全額請求されます。</div>
-<div>（例えば、10万円のオプションを6か月後に購入した場合、残り6か月分の5万円を請求し、再契約する際には1年分の10万円が請求されます。）</div>
-<div class="terms-head" style="margin-top:8px;">■ジョブの定義</div>
-<div>ジョブとは、オーダー内での固有のパーソナル化のことをいいます。</div>
-<div>注文内の同じ製品SKUでの同じパーソナライズの複数生産は、1つのジョブと見なされます。</div>
-<div>SKUとは、単一のサイズ、場所、または色からなる特定の製品のことです。</div>
-<div class="terms-head" style="margin-top:8px;">■サービス容量を超えた場合</div>
-<div>サービス容量を超過した場合、契約期間は自動的にリセットされ、新たに契約期間分が課金されます。</div>
-<div class="terms-head" style="margin-top:8px;">■サポート</div>
-<div>必要に応じて日割りによる出張、修理サービスがあります。年間契約費に営業時間内のサポートが含まれております。</div>
-<div>インシデントの定義　インシデントとは、単一サポートの問題とそれを解決するための労力として定義されています。単一サポートの問題とは、</div>
-<div>それ以上、下位の問題に分ける事が出来ないという意味です。仮に問題が1つではなく、下位の問題とともに構成されていれば、</div>
-<div>それぞれ個別のインシデントと見なします。　サポート時間についてはSaaS契約に記載されています。</div>
-</div>
-
-</div>
 </div>
 
 <script>
-  const DGNET_MODE = true;
   const TAX_RATE = 0.10;
-
-  // 刺繍ソフト（DG）価格・選択ルール
-  const DG_SOFTWARE = [
-    { id:'WRITER_PLUS', name:'Writer Plus（彩 付属）', price:0, optionsEnabled:false, fontsEnabled:false, lanRule:'WP' },
-    { id:'EXPRESS', name:'EXPRESS', price:165000, optionsEnabled:false, fontsEnabled:false, lanRule:'DG' },
-    { id:'COMPOSER', name:'COMPOSER', price:308000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'CREATOR', name:'CREATOR', price:451000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'ILLUSTRATOR_EXTREME', name:'ILLUSTRATOR EXTREME', price:615000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'ARTIST_PLUS', name:'ARTIST PLUS', price:801000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'MAESTRO', name:'MAESTRO', price:1081000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'DG_S', name:'DG-S', price:215000, optionsEnabled:false, fontsEnabled:false, lanRule:'DG' }
-  ];
-
-  const DG_OPTIONS = [
-    { id:'ELEMENT', name:'エレメント', price:57000, minGrade:'CREATOR' },
-    { id:'EVERYTHING_SEQUIN_PACK', name:'エブリシングシークインパック', price:299000, minGrade:'CREATOR' },
-    { id:'BEADS_PACK', name:'ビーズパック', price:437000, minGrade:'CREATOR' },
-    { id:'PHOTO_CREATOR', name:'フォトクリエーター', price:121000, minGrade:'ILLUSTRATOR_EXTREME' },
-    { id:'CHENILLE', name:'シェニール', price:156000, minGrade:'CREATOR' },
-    { id:'DIRECT_MACHINE_HOLDER', name:'ダイレクトマシンホルダー', price:42000, minGrade:'COMPOSER' },
-    { id:'CHENILLE_TUCKING', name:'シェニールタッキング', price:63000, minGrade:'COMPOSER' },
-    { id:'HEAD_GROUP', name:'ヘッドグループ（刺繍機ヘッド選択）', price:137000, minGrade:'ILLUSTRATOR_EXTREME' }
-  ];
-
-  const DG_FONTS = [
-    { id:'FONT_1', name:'フォント1（日本語以外）', price:38000, minGrade:'COMPOSER' },
-    { id:'SEQUIN_FONT_PACK', name:'シークインフォントパック', price:72000, minGrade:'COMPOSER' },
-    { id:'MONOGRAM_FONT_PACK', name:'モノグラムフォントパック', price:72000, minGrade:'COMPOSER' },
-    { id:'PLATINUM_FONT_PACK', name:'プラチナムフォントパック', price:180000, minGrade:'COMPOSER' },
-    { id:'FONT_MEDLEY', name:'フォントメドレー', price:72000, minGrade:'COMPOSER' },
-    { id:'SYMPHONY_1_FONT_PACK', name:'シンフォニー1 フォントパック', price:46000, minGrade:'COMPOSER' },
-    { id:'NONAKA_FONT', name:'野中フォント', price:72000, minGrade:'COMPOSER' },
-    { id:'TAJIMA_JP_FONT_DGA', name:'タジマ日本語フォント：DG:A', price:68000, minGrade:'COMPOSER' },
-    { id:'TAJIMA_JP_FONT_DGB', name:'タジマ日本語フォント：DG:B', price:68000, minGrade:'COMPOSER' },
-    { id:'TAJIMA_JP_FONT_DGC', name:'タジマ日本語フォント：DG:C（A+Bセット）', price:123000, minGrade:'COMPOSER' },
-    { id:'TAJIMA_JP_FONT_PACK', name:'タジマ日本語フォントパック（現標準フォント）', price:50000, minGrade:'COMPOSER' }
-  ];
-
-  const DG_LAN_LICENSES = {
-    DG: { id:'LAN_DG', name:'LAN刺繍機ライセンス（DG）', price:37000, note:'2〜10台目までの接続（追加）' },
-    WP: { id:'LAN_WRITER_PLUS', name:'LAN刺繍機ライセンス（ライタープラス）', price:18000, note:'2台目〜5台目の接続（追加）' }
-  };
-
-  // DG.NET.SaaS 商品マスタ
-  const DGNET_SAAS_BASE = [
-    { id:'ONDEMAND', name:'オンデマンド', price:274000, billingType:'annual', jobCount:6000 },
-    { id:'PERSO1', name:'パーソナライゼーション1', price:476000, billingType:'annual', jobCount:6000 },
-    { id:'PERSO2', name:'パーソナライゼーション2', price:916000, billingType:'annual', jobCount:18000 },
-    { id:'PERSO3', name:'パーソナライゼーション3', price:1512000, billingType:'annual', jobCount:48000 },
-    { id:'PERSO4', name:'パーソナライゼーション4', price:2134000, billingType:'annual', jobCount:120000 },
-    { id:'PERSO5', name:'パーソナライゼーション5', price:10667000, billingType:'annual', jobCount:720000 }
-  ];
-
-  const DGNET_SAAS_OPTIONS = [
-    // ハード
-    { id:'CONN', name:'出力デバイスの接続', price:30000, billingType:'annual', category:'hardware', hasQty:true, unitName:'台' },
-    
-    // オプション
-    { id:'MD', name:'モバイルデザイナー', price:207000, billingType:'annual', category:'option' },
-    { id:'ES', name:'追加EC店舗', price:42000, billingType:'annual', category:'option', hasQty:true, unitName:'店舗' },
-    
-    // スタンダードオプション
-    { id:'PA', name:'ワッペン', price:275000, billingType:'annual', category:'standard' },
-    { id:'NST', name:'標準ホスティング', price:275000, billingType:'annual', category:'standard', hasQty:true, unitName:'メディア' },
-    { id:'COLOR', name:'カラーリール API', price:403000, billingType:'annual', category:'standard' },
-    { id:'LBR', name:'レーザーブリッジ', price:403000, billingType:'annual', category:'standard' },
-    { id:'LOGO', name:'ロゴロッカー', price:275000, billingType:'annual', category:'standard' },
-    
-    // DTF
-    { id:'DTFB', name:'DTFビジネス', price:323000, billingType:'annual', category:'dtf' },
-    { id:'DTFP', name:'DTFプロフェッショナル', price:1134000, billingType:'annual', category:'dtf' },
-    
-    // 初期費用
-    { id:'SETA', name:'初期セットアップ（メディア、拠点、デザイナー、店舗を各1つ含む）', price:321000, billingType:'setup', category:'setup' },
-    { id:'SU2', name:'二次セットアップ（追加メディア、拠点、デザイナー、店舗もしくはECテーマに変更）', price:107000, billingType:'setup', category:'setup' },
-    
-    // スペシャル
-    { id:'PVEA', name:'追加PVエディター', price:67000, billingType:'setup', category:'special', hasQty:true, unitName:'個' },
-    { id:'CDEV', name:'カスタム開発', price:210000, billingType:'setup', category:'special', hasQty:true, unitName:'日' },
-    { id:'CFC', name:'カスタムフォント作成', price:162000, billingType:'setup', category:'special', hasQty:true, unitName:'フォント' },
-    
-    // サポート
-    { id:'SUP', name:'営業時間外サポート', price:101000, billingType:'incident', category:'support', hasQty:true, unitName:'インシデント' }
-  ];
-
-  // カテゴリ別表示名
-  const DGNET_CATEGORY_NAMES = {
-    'hardware': 'ハード',
-    'option': 'オプション',
-    'standard': 'スタンダードオプション',
-    'dtf': 'DTF',
-    'setup': '初期費用',
-    'special': 'スペシャル',
-    'support': 'サポート'
-  };
-
-  // SEID採番API設定
-  const QUOTE_CREATE_API_URL = window.SEID_API_ENDPOINT || 'https://daihiguchi.art/estimate-system/api/quote/create.php';
-  const QUOTE_API_KEY = window.SEID_API_KEY || 'seiken-estimate_2026_key_01271315';
-
-  // 担当者コードマップ
-  const TANTOU_CODE_MAP = {
-    '樋口大': 'DH',
-    '巽隆充': 'TT',
-    '三谷剛史': 'TM',
-    '山崎迅人': 'HY',
-    '與那城昭彦': 'AY',
-    '八田雅隆': 'MH'
-  };
+  const API_BASE = 'https://seiken-saas.ssl.xserver.jp/api/';
 
   let quoteNoManuallyEdited = false;
-  let SEID_CREATING = false;
 
-  function pad2(n){ return String(n).padStart(2,'0'); }
+  let dgSoftwareData = [
+    { id:'dg-pse', name:'Pulse Standard Edition', price:120000, cat:'DG単体ソフト' },
+    { id:'dg-ppe', name:'Pulse Pro Edition', price:250000, cat:'DG単体ソフト' },
+    { id:'dg-pee', name:'Pulse Elite Edition', price:450000, cat:'DG単体ソフト' },
+    { id:'ml-pse', name:'ML Pulse Standard', price:150000, cat:'ML単体ソフト' },
+    { id:'ml-ppe', name:'ML Pulse Pro', price:280000, cat:'ML単体ソフト' },
+  ];
 
-  function yyyymmddNow(d){
-    return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
+  let dgSoftwareState = {};
+
+  let freeformLines = [];
+
+  function yen(val){
+    if(typeof val !== 'number') return '¥0';
+    return '¥' + val.toLocaleString('ja-JP');
   }
-  function hhmmssNow(d){
-    return `${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`;
-  }
 
-  function getTantouCode(){
-    const name = document.getElementById('tantouSelect').value || '';
-    return TANTOU_CODE_MAP[name] || '--';
+  function formatDate(dateStr){
+    if(!dateStr) return '-';
+    const d = new Date(dateStr);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}年${m}月${day}日`;
   }
 
   function generateQuoteNoNow(){
-    const d = new Date();
-    const tantou = getTantouCode();
-    const model = 'DGNET';
-    return `${tantou}-${model}-${yyyymmddNow(d)}-${hhmmssNow(d)}`;
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth()+1).padStart(2,'0');
+    const d = String(now.getDate()).padStart(2,'0');
+    const h = String(now.getHours()).padStart(2,'0');
+    const min = String(now.getMinutes()).padStart(2,'0');
+    return `DGNET-${y}${m}${d}-${h}${min}`;
   }
 
-  function regenQuoteNo(){
-    const q = document.getElementById('quoteNo');
-    q.value = generateQuoteNoNow();
-    quoteNoManuallyEdited = false;
-    applyAndRender();
-  }
-
-  function onTantouChange(){
-    const q = document.getElementById('quoteNo');
-    if(!quoteNoManuallyEdited){
-      q.value = generateQuoteNoNow();
-    }
-    applyAndRender();
-  }
-
-  function calculateValidUntil() {
-    const issueDate = document.getElementById('issueDate').value;
-    const validText = document.getElementById('valid').value.trim() || '30日';
-    const validDays = parseInt(validText.replace(/[^0-9]/g, '')) || 30;
-    if (!issueDate) return '';
-    const d = new Date(issueDate);
-    d.setDate(d.getDate() + validDays);
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
-  async function createSeidOnBoot(force=false){
-    if(!force && sessionStorage.getItem('SEID_ALREADY_CREATED') === '1') return;
-
-    const issueDateEl = document.getElementById('issueDate');
-    const issueDate = (issueDateEl && issueDateEl.value) ? issueDateEl.value : (() => {
-      const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,'0');
-      const dd = String(d.getDate()).padStart(2,'0');
-      const iso = `${yyyy}-${mm}-${dd}`;
-      if(issueDateEl) issueDateEl.value = iso;
-      return iso;
-    })();
-
-    const staff = (document.getElementById('tantouSelect')?.value || '').trim();
-    const customer = (document.getElementById('toBase')?.value || '').trim();
-
-    if (!staff || !customer) {
-      console.log('SEID not created yet: staff or customer missing');
-      return;
-    }
-
-    const expiresYmd = calculateValidUntil() || (() => {
-      const d2 = new Date();
-      d2.setDate(d2.getDate() + 30);
-      const yyyy2 = d2.getFullYear();
-      const mm2 = String(d2.getMonth() + 1).padStart(2, '0');
-      const dd2 = String(d2.getDate()).padStart(2, '0');
-      return `${yyyy2}-${mm2}-${dd2}`;
-    })();
-
-    const payload = {
-      api_key: QUOTE_API_KEY,
-      expires_at: expiresYmd,
-      staff: staff || '未設定',
-      customer: customer || '顧客名未入力',
-      machine: '',
-      product_code: 'DGNET',
-      total: 0,
-      admin_quote_no: (document.getElementById('quoteNo')?.value || '').trim(),
-      data: {
-        created_at: new Date().toISOString(),
-        source: 'dgnet-saas',
-        issued_at: issueDate
+  async function getSEID(){
+    try {
+      const resp = await fetch(API_BASE + 'get-seid.php', {
+        method: 'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({source:'dgnet-saas'})
+      });
+      if(!resp.ok) throw new Error('SEID取得失敗');
+      const data = await resp.json();
+      if(data.seid){
+        document.getElementById('seidNo').value = data.seid;
+        if(!quoteNoManuallyEdited){
+          document.getElementById('quoteNo').value = generateQuoteNoNow();
+        }
+        applyAndRender();
+        alert(`SEID採番完了: ${data.seid}`);
+      } else {
+        alert('SEID取得失敗: ' + (data.error || '不明なエラー'));
       }
-    };
+    } catch(err){
+      alert('SEID採番エラー: ' + err.message);
+    }
+  }
 
-    const res = await fetch(QUOTE_CREATE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': QUOTE_API_KEY
-      },
-      body: JSON.stringify(payload)
+  function initDGSoftwareUI(){
+    dgSoftwareData.forEach(item => {
+      dgSoftwareState[item.id] = { on:false, qty:1 };
+    });
+    renderDGSoftwareUI();
+  }
+
+  function renderDGSoftwareUI(){
+    const container = document.getElementById('dgSoftwareContainer');
+    container.innerHTML = '';
+    const list = document.createElement('div');
+    list.className = 'opt-list';
+
+    dgSoftwareData.forEach(item => {
+      const state = dgSoftwareState[item.id];
+      const row = document.createElement('div');
+      row.className = 'opt-row ' + (state.on ? 'on' : 'off');
+
+      const lbl = document.createElement('div');
+      lbl.className = 'opt-label';
+      lbl.textContent = `${item.name} (${yen(item.price)})`;
+
+      const qtyDiv = document.createElement('div');
+      const qtyInput = document.createElement('input');
+      qtyInput.type = 'number';
+      qtyInput.min = '1';
+      qtyInput.className = 'opt-qty';
+      qtyInput.value = state.qty;
+      qtyInput.disabled = !state.on;
+      qtyInput.oninput = ()=>{
+        const v = parseInt(qtyInput.value)||1;
+        dgSoftwareState[item.id].qty = v;
+        applyAndRender();
+      };
+      qtyDiv.appendChild(qtyInput);
+
+      const switchDiv = document.createElement('label');
+      switchDiv.className = 'switch';
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.checked = state.on;
+      chk.onchange = ()=>{
+        dgSoftwareState[item.id].on = chk.checked;
+        row.className = 'opt-row ' + (chk.checked?'on':'off');
+        qtyInput.disabled = !chk.checked;
+        applyAndRender();
+      };
+      const slider = document.createElement('span');
+      slider.className = 'slider';
+      switchDiv.appendChild(chk);
+      switchDiv.appendChild(slider);
+
+      row.appendChild(lbl);
+      row.appendChild(qtyDiv);
+      row.appendChild(switchDiv);
+      list.appendChild(row);
     });
 
-    const raw = await res.text();
-    let data = null;
-    try { data = JSON.parse(raw); } catch(e){}
-
-    if(!res.ok){
-      console.error('SEID create failed', res.status, raw);
-      alert(`SEID採番に失敗しました（HTTP ${res.status}）\n${raw}`);
-      return;
-    }
-
-    const seid =
-      (data && (data.seid || data.quote_no || data.quoteNo || data.quote_number)) ||
-      (data && data.quote && (data.quote.seid || data.quote.quote_no)) ||
-      '';
-
-    if(!seid){
-      console.error('SEID not found', data);
-      alert('SEID採番レスポンスにSEIDが見つかりません。コンソールを確認してください。');
-      return;
-    }
-
-    const seidEl = document.getElementById('seidNo');
-    if(seidEl) seidEl.value = seid;
-
-    if(typeof applyAndRender === 'function') applyAndRender();
-
-    sessionStorage.setItem('SEID_ALREADY_CREATED', '1');
-    console.log('SEID created on boot:', seid);
+    container.appendChild(list);
   }
 
-  async function SetSEID(){
-    if(SEID_CREATING) {
-      console.log('SEID採番処理中です。しばらくお待ちください。');
-      return;
-    }
-
-    const ok = confirm('SEID番号を採番します。よろしいですか?(番号が進みます)');
-    if(!ok) return;
-
-    SEID_CREATING = true;
-    try {
-      sessionStorage.removeItem('SEID_ALREADY_CREATED');
-      await createSeidOnBoot(true);
-    } finally {
-      SEID_CREATING = false;
-    }
-  }
-
-  function normalizeZip(zip){
-    return (zip || '').trim().replace(/[^\d]/g, '');
-  }
-
-  function lookupZip(){
-    const raw = document.getElementById('zip').value;
-    const zip = normalizeZip(raw);
-
-    if(!zip){
-      alert('郵便番号を入力してください');
-      return;
-    }
-    if(zip.length !== 7){
-      alert('郵便番号は7桁で入力してください（例：5730102 / 573-0102）');
-      return;
-    }
-
-    fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`)
-      .then(res => res.json())
-      .then(data => {
-        if(data.status !== 200 || !data.results || !data.results[0]){
-          alert('住所が見つかりませんでした');
-          return;
-        }
-        const r = data.results[0];
-        document.getElementById('pref').value = r.address1 || '';
-        document.getElementById('city').value = r.address2 || '';
-        document.getElementById('town').value = r.address3 || '';
-        applyAndRender();
-      })
-      .catch(() => {
-        const pref=document.getElementById('pref')?.value?.trim();
-        const city=document.getElementById('city')?.value?.trim();
-        const town=document.getElementById('town')?.value?.trim();
-        if(!(pref||city||town)) alert('住所検索に失敗しました（ネットワーク等）');
-      });
-  }
-
-  function buildPlaceText(){
-    const zipRaw = document.getElementById('zip').value.trim();
-    const zip = normalizeZip(zipRaw);
-    const pref = document.getElementById('pref').value.trim();
-    const city = document.getElementById('city').value.trim();
-    const town = document.getElementById('town').value.trim();
-    const addr2 = document.getElementById('addr2').value.trim();
-
-    if(!zip && !pref && !city && !town && !addr2){
-      return '御社ご指定場所';
-    }
-
-    const zipDisp = zip ? `〒${zip.slice(0,3)}-${zip.slice(3)}` : '';
-    const addrLine = `${pref}${city}${town}${addr2}`.trim();
-
-    if(zipDisp && addrLine) return `${zipDisp}\n${addrLine}`;
-    return (zipDisp || addrLine || '御社ご指定場所');
-  }
-
-  function onDGNetBaseChange(){
-    renderDGNetOptions();
-    if(!quoteNoManuallyEdited){
-      document.getElementById('quoteNo').value = generateQuoteNoNow();
-    }
+  function resetDGSoftwareSection(){
+    dgSoftwareData.forEach(item => {
+      dgSoftwareState[item.id] = { on:false, qty:1 };
+    });
+    renderDGSoftwareUI();
     applyAndRender();
   }
 
   function renderDGNetOptions(){
     const base = document.getElementById('dgnetBase').value;
-    const panel = document.getElementById('dgnetOptionsPanel');
-    const list = document.getElementById('dgnetOptionsList');
-    
-    if(!base){
-      panel.style.display = 'none';
-      list.innerHTML = '';
-      return;
-    }
+    const container = document.getElementById('dgnetOptionsContainer');
+    container.innerHTML = '';
+    if(!base) return;
 
-    panel.style.display = '';
-    list.innerHTML = '';
+    const opts = [
+      { id:'opt-designer', name:'刺繍デザイナー追加ライセンス', price:5000 },
+      { id:'opt-storage', name:'追加ストレージ 50GB', price:3000 },
+      { id:'opt-support', name:'24時間サポート', price:8000 },
+    ];
 
-    // カテゴリ別にグループ化して表示
-    const categories = ['hardware', 'option', 'standard', 'dtf', 'setup', 'special', 'support'];
-    
-    categories.forEach(cat => {
-      const items = DGNET_SAAS_OPTIONS.filter(o => o.category === cat);
-      if(items.length === 0) return;
+    const list = document.createElement('div');
+    list.className = 'opt-list';
 
-      const catDiv = document.createElement('div');
-      catDiv.style.marginTop = '12px';
-      catDiv.innerHTML = `<div style="font-weight:700; font-size:12px; color:#666; margin-bottom:6px;">${DGNET_CATEGORY_NAMES[cat]}</div>`;
-      
-      items.forEach(opt => {
-        const div = document.createElement('div');
-        div.className = 'opt-row off';
-        div.id = `dgnet_row_${opt.id}`;
+    opts.forEach(opt => {
+      const row = document.createElement('div');
+      row.className = 'opt-row off';
+      row.id = opt.id + '-row';
 
-        let qtyField = '';
-        if(opt.hasQty){
-          qtyField = `<input type="number" id="dgnet_qty_${opt.id}" class="opt-qty" min="1" step="1" value="1" oninput="applyAndRender()" />`;
-        } else {
-          qtyField = '<div style="width:80px;"></div>';
-        }
+      const lbl = document.createElement('div');
+      lbl.className = 'opt-label';
+      lbl.textContent = `${opt.name} (+${yen(opt.price)}/月)`;
 
-        div.innerHTML = `
-          <label class="switch">
-            <input type="checkbox" id="dgnet_${opt.id}" onchange="toggleDGNetOption('${opt.id}')">
-            <span class="slider"></span>
-          </label>
-          <div class="opt-label">
-            ${opt.name}
-            <span style="color:#666; font-size:12px; margin-left:6px;">¥${opt.price.toLocaleString()}</span>
-            ${opt.hasQty ? `<span style="color:#666; font-size:11px; margin-left:4px;">/${opt.unitName}</span>` : ''}
-          </div>
-          ${qtyField}
-        `;
+      const qtyDiv = document.createElement('div');
+      const qtyInput = document.createElement('input');
+      qtyInput.type = 'number';
+      qtyInput.min = '1';
+      qtyInput.className = 'opt-qty';
+      qtyInput.value = '1';
+      qtyInput.disabled = true;
+      qtyInput.id = opt.id + '-qty';
+      qtyDiv.appendChild(qtyInput);
 
-        catDiv.appendChild(div);
-      });
-
-      list.appendChild(catDiv);
-    });
-
-    updateDGNetSummary();
-  }
-
-  function toggleDGNetOption(id){
-    const cb = document.getElementById(`dgnet_${id}`);
-    const row = document.getElementById(`dgnet_row_${id}`);
-    if(cb && row){
-      row.className = cb.checked ? 'opt-row on' : 'opt-row off';
-    }
-    updateDGNetSummary();
-    applyAndRender();
-  }
-
-  function updateDGNetSummary(){
-    const sumEl = document.getElementById('dgnetOptionsSummary');
-    if(!sumEl) return;
-
-    const selected = getSelectedDGNetOptions();
-    if(selected.length === 0){
-      sumEl.textContent = '';
-      return;
-    }
-
-    const total = selected.reduce((s, it) => s + (it.unitPrice * it.qty), 0);
-    sumEl.textContent = `${selected.length}項目 / 合計 ¥${total.toLocaleString()}`;
-  }
-
-  function getSelectedDGNetOptions(){
-    const items = [];
-    DGNET_SAAS_OPTIONS.forEach(opt => {
-      const cb = document.getElementById(`dgnet_${opt.id}`);
-      if(!cb || !cb.checked) return;
-      
-      let qty = 1;
-      if(opt.hasQty){
-        const qtyEl = document.getElementById(`dgnet_qty_${opt.id}`);
-        qty = Math.max(1, parseInt(qtyEl?.value || '1', 10));
-      }
-
-      items.push({
-        name: opt.name,
-        qty: qty,
-        unitPrice: opt.price,
-        billingType: opt.billingType,
-        category: opt.category
-      });
-    });
-    return items;
-  }
-
-  // =========================================================
-  // 刺繍ソフト（DG）関連関数
-  // =========================================================
-  
-  function renderDGSelect(){
-    const sel = document.getElementById('dgGrade');
-    if(!sel) return;
-    sel.innerHTML = '<option value="">選択してください</option>';
-    DG_SOFTWARE.forEach(dg => {
-      const opt = document.createElement('option');
-      opt.value = dg.id;
-      opt.textContent = `${dg.name} ￥${dg.price.toLocaleString()}`;
-      sel.appendChild(opt);
-    });
-  }
-
-  function getSelectedDG(){
-    const sel = document.getElementById('dgGrade');
-    const id = sel?.value || '';
-    return DG_SOFTWARE.find(d => d.id === id) || null;
-  }
-
-  function isGradeAtLeast(currentGrade, minGrade){
-    const order = ['WRITER_PLUS','EXPRESS','COMPOSER','CREATOR','ILLUSTRATOR_EXTREME','ARTIST_PLUS','MAESTRO','DG_S'];
-    const ci = order.indexOf(currentGrade);
-    const mi = order.indexOf(minGrade);
-    if(ci < 0 || mi < 0) return false;
-    return ci >= mi;
-  }
-
-  function toggleDGItem(prefix, id){
-    const cb = document.getElementById(`${prefix}_${id}`);
-    const row = document.getElementById(`${prefix}_row_${id}`);
-    if(cb && row){
-      row.className = cb.checked ? 'opt-row on' : 'opt-row off';
-    }
-    updateDGSummary();
-    applyAndRender();
-  }
-
-  function renderDGToggleItem(container, item, prefix){
-    const div = document.createElement('div');
-    div.className = 'opt-row off';
-    div.id = `${prefix}_row_${item.id}`;
-
-    div.innerHTML = `
-      <label class="switch">
-        <input type="checkbox" id="${prefix}_${item.id}" onchange="toggleDGItem('${prefix}','${item.id}')">
-        <span class="slider"></span>
-      </label>
-      <div class="opt-label">
-        ${item.name}
-        <span style="color:#666; font-size:12px; margin-left:6px;">￥${item.price.toLocaleString()}</span>
-      </div>
-      <input type="number" id="${prefix}_${item.id}_qty" class="opt-qty" min="1" step="1" value="1" oninput="applyAndRender()" />
-    `;
-
-    container.appendChild(div);
-  }
-
-  function clearDGSelections(prefix){
-    const list = document.querySelectorAll(`[id^="${prefix}_row_"] input[type="checkbox"]`);
-    list.forEach(cb => { cb.checked = false; });
-    const rows = document.querySelectorAll(`[id^="${prefix}_row_"]`);
-    rows.forEach(r => { r.className = 'opt-row off'; });
-  }
-
-  function renderDGLists(){
-    const dg = getSelectedDG();
-
-    const optPanel = document.getElementById('dgOptPanel');
-    const fontPanel = document.getElementById('dgFontPanel');
-    const lanPanel = document.getElementById('dgLanPanel');
-
-    const optList = document.getElementById('dgOptList');
-    const fontList = document.getElementById('dgFontList');
-    const lanList = document.getElementById('dgLanList');
-    const lessonRow = document.getElementById('dgopt_row_DG_LESSON');
-
-    if(!optList || !fontList || !lanList) return;
-
-    if(!dg){
-      optPanel.style.display = 'none';
-      fontPanel.style.display = 'none';
-      lanPanel.style.display = 'none';
-      optList.innerHTML = '';
-      fontList.innerHTML = '';
-      lanList.innerHTML = '';
-      if(lessonRow) lessonRow.style.display = 'none';
-      return;
-    }
-
-    optPanel.style.display = dg.optionsEnabled ? '' : 'none';
-    if(lessonRow) lessonRow.style.display = dg.optionsEnabled ? '' : 'none';
-    if(!dg.optionsEnabled){
-      const cbL = document.getElementById('dgopt_DG_LESSON');
-      if(cbL) cbL.checked = false;
-      if(lessonRow) lessonRow.className = 'opt-row off';
-    }
-    fontPanel.style.display = dg.fontsEnabled ? '' : 'none';
-
-    optList.innerHTML = '';
-    fontList.innerHTML = '';
-    if(dg.optionsEnabled){
-      DG_OPTIONS.filter(it => isGradeAtLeast(dg.id, it.minGrade)).forEach(it => renderDGToggleItem(optList, it, 'dgopt'));
-    }
-    if(dg.fontsEnabled){
-      DG_FONTS.filter(it => isGradeAtLeast(dg.id, it.minGrade)).forEach(it => renderDGToggleItem(fontList, it, 'dgfont'));
-    }
-
-    clearDGSelections('dgopt');
-    clearDGSelections('dgfont');
-
-    lanPanel.style.display = '';
-    lanList.innerHTML = '';
-    if(dg.lanRule === 'WP'){
-      renderDGToggleItem(lanList, DG_LAN_LICENSES.WP, 'dglan');
-    }else if(dg.lanRule === 'DG'){
-      renderDGToggleItem(lanList, DG_LAN_LICENSES.DG, 'dglan');
-    }
-    clearDGSelections('dglan');
-
-    updateDGSummary();
-  }
-
-  function getSelectedDGItems(prefix, master){
-    const items = [];
-    master.forEach(it => {
-      const cb = document.getElementById(`${prefix}_${it.id}`);
-      if(!cb || !cb.checked) return;
-      const qtyEl = document.getElementById(`${prefix}_${it.id}_qty`);
-      const qty = Math.max(1, parseInt(qtyEl?.value || '1', 10));
-      items.push({ name: it.name, qty, unitPrice: it.price });
-    });
-    return items;
-  }
-
-  function getSelectedDGLan(dg){
-    if(!dg) return [];
-    const lan = (dg.lanRule === 'WP') ? DG_LAN_LICENSES.WP : DG_LAN_LICENSES.DG;
-    const cb = document.getElementById(`dglan_${lan.id}`);
-    if(!cb || !cb.checked) return [];
-    const qtyEl = document.getElementById(`dglan_${lan.id}_qty`);
-    const qty = Math.max(1, parseInt(qtyEl?.value || '1', 10));
-    const name = lan.note ? `${lan.name}（${lan.note}）` : lan.name;
-    return [{ name, qty, unitPrice: lan.price }];
-  }
-
-  function getSelectedDGLessonItem(){
-    const cb = document.getElementById('dgopt_DG_LESSON');
-    if(!cb || !cb.checked) return null;
-    const priceEl = document.getElementById('dgopt_DG_LESSON_price');
-    const qtyEl = document.getElementById('dgopt_DG_LESSON_qty');
-    const unitPrice = Math.max(0, parseInt(priceEl?.value || '0', 10)) || 0;
-    const qty = Math.max(1, parseInt(qtyEl?.value || '1', 10)) || 1;
-    return { name:'DG講習費用', qty, unitPrice };
-  }
-
-  function updateDGSummary(){
-    const dg = getSelectedDG();
-    const optS = document.getElementById('dgOptSummary');
-    const fontS = document.getElementById('dgFontSummary');
-    const lanS = document.getElementById('dgLanSummary');
-    if(!dg){
-      if(optS) optS.textContent = '';
-      if(fontS) fontS.textContent = '';
-      if(lanS) lanS.textContent = '';
-      return;
-    }
-
-    const optItemsBase = dg.optionsEnabled ? getSelectedDGItems('dgopt', DG_OPTIONS.filter(it => isGradeAtLeast(dg.id, it.minGrade))) : [];
-    const lessonItem = dg.optionsEnabled ? getSelectedDGLessonItem() : null;
-    const optItems = lessonItem ? [lessonItem, ...optItemsBase] : optItemsBase;
-    const fontItems = dg.fontsEnabled ? getSelectedDGItems('dgfont', DG_FONTS.filter(it => isGradeAtLeast(dg.id, it.minGrade))) : [];
-    const lanItems = getSelectedDGLan(dg);
-
-    const sum = arr => arr.reduce((s,it)=>s + (it.unitPrice* (Number(it.qty)||0)),0);
-
-    if(optS) optS.textContent = optItems.length ? `${optItems.length}項目 / 合計 ¥${sum(optItems).toLocaleString()}` : '';
-    if(fontS) fontS.textContent = fontItems.length ? `${fontItems.length}項目 / 合計 ¥${sum(fontItems).toLocaleString()}` : '';
-    if(lanS)  lanS.textContent = lanItems.length ? `合計 ¥${sum(lanItems).toLocaleString()}` : '';
-  }
-
-  function initDGSoftwareUI(){
-    renderDGSelect();
-    const sel = document.getElementById('dgGrade');
-    if(sel){
-      sel.addEventListener('change', ()=>{
-        renderDGLists();
-        const q = document.getElementById('quoteNo');
-        if(!quoteNoManuallyEdited){
-          q.value = generateQuoteNoNow();
-        }
+      const switchDiv = document.createElement('label');
+      switchDiv.className = 'switch';
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.id = opt.id + '-chk';
+      chk.onchange = ()=>{
+        row.className = 'opt-row ' + (chk.checked?'on':'off');
+        qtyInput.disabled = !chk.checked;
         applyAndRender();
-      });
-    }
+      };
+      const slider = document.createElement('span');
+      slider.className = 'slider';
+      switchDiv.appendChild(chk);
+      switchDiv.appendChild(slider);
 
-    renderDGLists();
-
-    const optPanel = document.getElementById('dgOptPanel');
-    const fontPanel = document.getElementById('dgFontPanel');
-    const lanPanel = document.getElementById('dgLanPanel');
-    if(optPanel) optPanel.open = false;
-    if(fontPanel) fontPanel.open = false;
-    if(lanPanel) lanPanel.open = false;
-  }
-
-  function resetDGSoftwareSection(){
-    const grade = document.getElementById("dgGrade");
-    const qty = document.getElementById("dgQty");
-
-    if(qty) qty.value = "1";
-    if(grade) grade.value = "";
-
-    ["dgopt","dgfont","dglan"].forEach(prefix=>{
-      try{
-        clearDGSelections(prefix);
-      }catch(e){}
+      row.appendChild(lbl);
+      row.appendChild(qtyDiv);
+      row.appendChild(switchDiv);
+      list.appendChild(row);
     });
 
-    try{
-      renderDGLists();
-    }catch(e){}
-
-    const lcb = document.getElementById('dgopt_DG_LESSON');
-    const lprice = document.getElementById('dgopt_DG_LESSON_price');
-    const lqty = document.getElementById('dgopt_DG_LESSON_qty');
-    if(lcb) lcb.checked = false;
-    if(lprice) lprice.value = '0';
-    if(lqty) lqty.value = '1';
-    const lrow = document.getElementById('dgopt_row_DG_LESSON');
-    if(lrow) lrow.className = 'opt-row off';
-
-    const optPanel = document.getElementById("dgOptPanel");
-    const fontPanel = document.getElementById("dgFontPanel");
-    const lanPanel = document.getElementById("dgLanPanel");
-    if(optPanel) optPanel.open = false;
-    if(fontPanel) fontPanel.open = false;
-    if(lanPanel) lanPanel.open = false;
-
-    try{
-      updateDGSummary();
-    }catch(e){}
-    
-    applyAndRender();
-  }
-
-  // =========================================================
-  // フリーフォーム明細
-  // =========================================================
-  let freeformLines = [];
-
-  function loadFreeform(){
-    try{
-      const raw = localStorage.getItem('seiken_dgnet_freeform_lines');
-      if(raw){
-        const arr = JSON.parse(raw);
-        if(Array.isArray(arr)) freeformLines = arr;
-      }
-    }catch(e){}
-    if(!Array.isArray(freeformLines)) freeformLines = [];
+    container.appendChild(list);
   }
 
   function saveFreeform(){
-    try{ localStorage.setItem('seiken_dgnet_freeform_lines', JSON.stringify(freeformLines)); }catch(e){}
+    localStorage.setItem('dgnet-freeform', JSON.stringify(freeformLines));
   }
 
-  function resetFreeform(){
-    if(!confirm('フリーフォーム明細をリセットしますか？')) return;
-    freeformLines = [];
+  function loadFreeform(){
+    const stored = localStorage.getItem('dgnet-freeform');
+    if(stored){
+      try {
+        freeformLines = JSON.parse(stored);
+      } catch(e){
+        freeformLines = [];
+      }
+    }
+  }
+
+  function addFreeformLine(){
+    const id = 'free-' + Date.now();
+    freeformLines.push({ id, name:'', qty:1, unitPrice:0 });
     saveFreeform();
     renderFreeform();
     applyAndRender();
   }
 
-  function addFreeformProduct(){
-    freeformLines.push({ type:'product', name:'', qty:1, unitPrice:0 });
-    saveFreeform();
-    renderFreeform();
-    applyAndRender();
-  }
-
-  function addFreeformText(){
-    freeformLines.push({ type:'text', name:'' });
-    saveFreeform();
-    renderFreeform();
-    applyAndRender();
-  }
-
-  function removeFreeformLine(i){
-    freeformLines.splice(i,1);
-    saveFreeform();
-    renderFreeform();
-    applyAndRender();
-  }
-
-  function moveFreeformLine(i, dir){
-    const j = i + dir;
-    if(j < 0 || j >= freeformLines.length) return;
-    const tmp = freeformLines[i];
-    freeformLines[i] = freeformLines[j];
-    freeformLines[j] = tmp;
+  function removeFreeformLine(id){
+    freeformLines = freeformLines.filter(l => l.id !== id);
     saveFreeform();
     renderFreeform();
     applyAndRender();
   }
 
   function renderFreeform(){
-    const box = document.getElementById('freeformList');
-    if(!box) return;
-    if(!Array.isArray(freeformLines)) freeformLines = [];
-
+    const container = document.getElementById('freeformContainer');
+    container.innerHTML = '';
     if(freeformLines.length === 0){
-      box.innerHTML = `<div class="muted" style="padding:10px; border:1px dashed #ccc; border-radius:10px;">
-        まだ明細がありません。「商品行を追加」「テキスト行を追加」から追加してください。
-      </div>`;
+      container.innerHTML = '<div class="muted" style="padding:10px;">項目なし</div>';
       return;
     }
 
-    const rows = freeformLines.map((ln, i) => {
-      const upDown = `
-        <button class="btn mini" type="button" onclick="moveFreeformLine(${i},-1)">↑</button>
-        <button class="btn mini" type="button" onclick="moveFreeformLine(${i}, 1)">↓</button>
-        <button class="btn mini" type="button" onclick="removeFreeformLine(${i})">削除</button>
-      `;
+    freeformLines.forEach(line => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:center;';
 
-      if(ln.type === 'product'){
-        const qty = (ln.qty ?? 1);
-        const unit = (ln.unitPrice ?? 0);
-        return `
-          <div class="opt-row off" style="align-items:center; gap:8px;">
-            <div class="opt-label" style="flex:1; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-              <span style="font-weight:700;">商品行</span>
-              <input type="text" value="${escapeHtml(ln.name ?? '')}" placeholder="品名（例：DG16）" style="width:320px;" oninput="onFreeformChangeName(${i}, this.value)" />
-              <span style="font-size:12px; color:#666;">数量</span>
-              <input type="number" value="${qty}" min="0" step="1" style="width:90px;" oninput="onFreeformChangeQty(${i}, this.value)" />
-              <span style="font-size:12px; color:#666;">単価</span>
-              <input type="number" value="${unit}" min="0" step="100" style="width:130px;" oninput="onFreeformChangeUnit(${i}, this.value)" />
-            </div>
-            <div style="display:flex; gap:6px;">${upDown}</div>
-          </div>
-        `;
-      }else{
-        return `
-          <div class="opt-row off" style="align-items:center; gap:8px;">
-            <div class="opt-label" style="flex:1; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-              <span style="font-weight:700;">テキスト行</span>
-              <input type="text" value="${escapeHtml(ln.name ?? '')}" placeholder="説明文（数量・金額は空欄）" style="width:520px;" oninput="onFreeformChangeText(${i}, this.value)" />
-            </div>
-            <div style="display:flex; gap:6px;">${upDown}</div>
-          </div>
-        `;
-      }
-    }).join('');
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.placeholder = '品名';
+      nameInput.value = line.name;
+      nameInput.style.flex = '1';
+      nameInput.oninput = ()=>{
+        line.name = nameInput.value;
+        saveFreeform();
+        applyAndRender();
+      };
 
-    box.innerHTML = rows;
-  }
+      const qtyInput = document.createElement('input');
+      qtyInput.type = 'number';
+      qtyInput.min = '1';
+      qtyInput.value = line.qty;
+      qtyInput.style.width = '70px';
+      qtyInput.oninput = ()=>{
+        line.qty = parseInt(qtyInput.value)||1;
+        saveFreeform();
+        applyAndRender();
+      };
 
-  function onFreeformChangeName(i, v){ freeformLines[i].name = v; saveFreeform(); applyAndRender(); }
-  function onFreeformChangeQty(i, v){
-    const n = parseFloat(v);
-    freeformLines[i].qty = Number.isFinite(n) ? n : 0;
-    saveFreeform();
-    applyAndRender();
-  }
-  function onFreeformChangeUnit(i, v){
-    const n = parseFloat(v);
-    freeformLines[i].unitPrice = Number.isFinite(n) ? n : 0;
-    saveFreeform();
-    applyAndRender();
-  }
-  function onFreeformChangeText(i, v){ freeformLines[i].name = v; saveFreeform(); applyAndRender(); }
+      const priceInput = document.createElement('input');
+      priceInput.type = 'number';
+      priceInput.min = '0';
+      priceInput.value = line.unitPrice;
+      priceInput.style.width = '120px';
+      priceInput.placeholder = '単価';
+      priceInput.oninput = ()=>{
+        line.unitPrice = parseInt(priceInput.value)||0;
+        saveFreeform();
+        applyAndRender();
+      };
 
-  function escapeHtml(str){
-    return String(str)
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'","&#39;");
-  }
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '✕';
+      delBtn.className = 'btn mini';
+      delBtn.onclick = ()=> removeFreeformLine(line.id);
 
-  function buildLineItems(){
-    const lines = [];
-    
-    // 刺繍ソフト（DG）
-    const dg = getSelectedDG();
-    if(dg){
-      const dgQty = Math.max(1, parseInt(document.getElementById('dgQty')?.value || '1', 10));
-      lines.push({
-        name: `刺繍ソフト：${dg.name}`,
-        qty: dgQty,
-        unitPrice: dg.price,
-        displayGroup: 'その他'
-      });
-
-      if(dg.optionsEnabled){
-        const optMaster = DG_OPTIONS.filter(it => isGradeAtLeast(dg.id, it.minGrade));
-        const lesson = getSelectedDGLessonItem();
-        if(lesson){
-          lines.push({
-            name: lesson.name,
-            qty: lesson.qty,
-            unitPrice: lesson.unitPrice,
-            displayGroup: 'その他'
-          });
-        }
-        getSelectedDGItems('dgopt', optMaster).forEach(it => {
-          lines.push({
-            name: it.name,
-            qty: it.qty,
-            unitPrice: it.unitPrice,
-            displayGroup: 'その他'
-          });
-        });
-      }
-      if(dg.fontsEnabled){
-        const fontMaster = DG_FONTS.filter(it => isGradeAtLeast(dg.id, it.minGrade));
-        getSelectedDGItems('dgfont', fontMaster).forEach(it => {
-          lines.push({
-            name: it.name,
-            qty: it.qty,
-            unitPrice: it.unitPrice,
-            displayGroup: 'その他'
-          });
-        });
-      }
-      getSelectedDGLan(dg).forEach(it => {
-        lines.push({
-          name: it.name,
-          qty: it.qty,
-          unitPrice: it.unitPrice,
-          displayGroup: 'その他'
-        });
-      });
-    }
-    
-    // DG.NET.SaaS サービスベース
-    const baseId = document.getElementById('dgnetBase').value;
-    if(baseId){
-      const base = DGNET_SAAS_BASE.find(b => b.id === baseId);
-      if(base){
-        lines.push({
-          name: `${base.name}（年間ジョブ数${base.jobCount.toLocaleString()}）`,
-          qty: 1,
-          unitPrice: base.price,
-          billingType: base.billingType,
-          displayGroup: '年間費用'
-        });
-      }
-    }
-
-    // DG.NET.SaaS オプション
-    const options = getSelectedDGNetOptions();
-    options.forEach(opt => {
-      lines.push({
-        name: opt.name,
-        qty: opt.qty,
-        unitPrice: opt.unitPrice,
-        billingType: opt.billingType,
-        displayGroup: (opt.billingType === 'annual') ? '年間費用' : '初期費用'
-      });
+      row.appendChild(nameInput);
+      row.appendChild(qtyInput);
+      row.appendChild(priceInput);
+      row.appendChild(delBtn);
+      container.appendChild(row);
     });
-
-    // フリーフォーム明細
-    (freeformLines || []).forEach(ln => {
-      if(!ln) return;
-      if(ln.type === 'product'){
-        const name = (ln.name ?? '').trim();
-        const qty = (ln.qty ?? 0);
-        const unit = (ln.unitPrice ?? 0);
-        lines.push({
-          name: name,
-          qty: qty === 0 ? '' : qty,
-          unitPrice: unit === 0 ? '' : unit,
-          displayGroup: 'その他'
-        });
-      }else{
-        const name = (ln.name ?? '').trim();
-        lines.push({ name: name, qty:'', unitPrice:'', displayGroup: 'その他' });
-      }
-    });
-
-    return lines;
-  }
-
-  function yen(n){
-    if(typeof n !== 'number') return '';
-    return n.toLocaleString();
   }
 
   function applyAndRender(){
     const issueDate = document.getElementById('issueDate').value;
-    const toBase = document.getElementById('toBase').value.trim();
-    const toHonorific = document.getElementById('toHonorific').value;
-    const tantou = document.getElementById('tantouSelect').value;
-    const delivery = document.getElementById('delivery').value;
-    const payment = document.getElementById('payment').value;
-    const valid = document.getElementById('valid').value;
-    const notes = document.getElementById('notes').value;
-
     const seidNo = document.getElementById('seidNo').value.trim();
     const quoteNo = document.getElementById('quoteNo').value.trim();
+    const tantou = document.getElementById('tantouSelect').value;
 
-    let dateDisp = '';
-    if(issueDate){
-      const d = new Date(issueDate);
-      const era = d.getFullYear() >= 2019 ? '令和' : '平成';
-      const year = d.getFullYear() >= 2019 ? d.getFullYear() - 2018 : d.getFullYear() - 1988;
-      dateDisp = `${era} ${year} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日`;
+    const toBase = document.getElementById('toBase').value.trim();
+    const toHonorific = document.getElementById('toHonorific').value;
+    const toFull = toBase ? `${toBase} ${toHonorific}` : '';
+
+    const zip = document.getElementById('zip').value.trim();
+    const pref = document.getElementById('pref').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const town = document.getElementById('town').value.trim();
+    const addr2 = document.getElementById('addr2').value.trim();
+
+    let addrParts = [];
+    if(zip) addrParts.push(`〒${zip}`);
+    if(pref) addrParts.push(pref);
+    if(city) addrParts.push(city);
+    if(town) addrParts.push(town);
+    if(addr2) addrParts.push(addr2);
+    const addrFull = addrParts.join(' ');
+
+    const delivery = document.getElementById('delivery').value.trim();
+    const payment = document.getElementById('payment').value.trim();
+    const valid = document.getElementById('valid').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    document.getElementById('outToName').textContent = toFull || '(宛先未入力)';
+    document.getElementById('outToAddr').textContent = addrFull || '';
+    document.getElementById('outQuoteNo').textContent = quoteNo || '-';
+    document.getElementById('outIssueDate').textContent = formatDate(issueDate);
+    document.getElementById('outSEID').textContent = seidNo || '-';
+    document.getElementById('outTantou').textContent = tantou || '-';
+
+    document.getElementById('outDelivery').textContent = delivery || '-';
+    document.getElementById('outPayment').textContent = payment || '-';
+    document.getElementById('outValid').textContent = valid ? `発行日より ${valid}` : '-';
+    document.getElementById('outNotes').textContent = notes || '特記事項なし';
+
+    const lines = [];
+
+    const dgnetBase = document.getElementById('dgnetBase').value;
+    if(dgnetBase){
+      let baseName = '';
+      let basePrice = 0;
+      if(dgnetBase === 'standard'){ baseName='DG.NET SaaS スタンダード'; basePrice=28000; }
+      else if(dgnetBase === 'professional'){ baseName='DG.NET SaaS プロフェッショナル'; basePrice=38000; }
+      else if(dgnetBase === 'enterprise'){ baseName='DG.NET SaaS エンタープライズ'; basePrice=58000; }
+
+      lines.push({
+        name: `${baseName} (月額)`,
+        qty: 1,
+        unitPrice: basePrice,
+        displayGroup: '年間費用'
+      });
+
+      const opts = [
+        { id:'opt-designer', name:'刺繍デザイナー追加ライセンス', price:5000 },
+        { id:'opt-storage', name:'追加ストレージ 50GB', price:3000 },
+        { id:'opt-support', name:'24時間サポート', price:8000 },
+      ];
+
+      opts.forEach(opt => {
+        const chk = document.getElementById(opt.id + '-chk');
+        if(chk && chk.checked){
+          const qtyEl = document.getElementById(opt.id + '-qty');
+          const qty = qtyEl ? (parseInt(qtyEl.value)||1) : 1;
+          lines.push({
+            name: `${opt.name} (月額)`,
+            qty: qty,
+            unitPrice: opt.price,
+            displayGroup: '年間費用'
+          });
+        }
+      });
     }
 
-    const noDisp = seidNo ? `No.${seidNo}` : (quoteNo || 'No.--MODEL----------');
+    dgSoftwareData.forEach(item => {
+      const state = dgSoftwareState[item.id];
+      if(state.on){
+        lines.push({
+          name: item.name,
+          qty: state.qty,
+          unitPrice: item.price,
+          displayGroup: '初期費用'
+        });
+      }
+    });
 
-    document.getElementById('outNo').textContent = noDisp;
-    document.getElementById('outDate').textContent = dateDisp;
-    document.getElementById('outTo').textContent = toBase ? `${toBase}　${toHonorific}` : '株式会社　＿＿＿＿　御中';
-    document.getElementById('outDelivery').textContent = delivery || '受注後 約3カ月';
-    document.getElementById('outPlace').textContent = buildPlaceText();
-    document.getElementById('outPayment').textContent = payment || '納入時 現金一括払い';
-    document.getElementById('outValid').textContent = valid;
-    document.getElementById('outTantou').textContent = `担当者　${tantou || '＿＿＿＿'}`;
-    document.getElementById('outNotes').textContent = notes;
+    freeformLines.forEach(fl => {
+      if(fl.name.trim()){
+        lines.push({
+          name: fl.name,
+          qty: fl.qty,
+          unitPrice: fl.unitPrice,
+          displayGroup: 'その他'
+        });
+      }
+    });
 
-    const lines = buildLineItems();
-    const tbody = document.getElementById('outItems');
+    const tbody = document.getElementById('quoteTableBody');
     tbody.innerHTML = '';
 
-    // 年間費用と初期費用に分ける
     const annualLines = lines.filter(l => l.displayGroup === '年間費用');
     const setupLines = lines.filter(l => l.displayGroup === '初期費用');
     const otherLines = lines.filter(l => l.displayGroup === 'その他');
@@ -1828,7 +1027,6 @@
     let annualTotal = 0;
     let setupTotal = 0;
 
-    // 年間費用セクション
     if(annualLines.length > 0){
       const headerTr = document.createElement('tr');
       headerTr.innerHTML = '<td colspan="4" style="background:#e8e8e8; font-weight:700;">DG.NET SaaS サービスベース</td>';
@@ -1868,7 +1066,6 @@
         tbody.appendChild(tr);
       });
 
-      // 年間費用合計
       const subtotalTr = document.createElement('tr');
       subtotalTr.className = 'section-subtotal';
       subtotalTr.innerHTML = `
@@ -1878,7 +1075,6 @@
       tbody.appendChild(subtotalTr);
     }
 
-    // 初期費用セクション
     if(setupLines.length > 0){
       setupLines.forEach(li => {
         const tr = document.createElement('tr');
@@ -1914,7 +1110,6 @@
         tbody.appendChild(tr);
       });
 
-      // 初期費用合計
       const subtotalTr = document.createElement('tr');
       subtotalTr.className = 'section-subtotal';
       subtotalTr.innerHTML = `
@@ -1924,7 +1119,6 @@
       tbody.appendChild(subtotalTr);
     }
 
-    // その他（フリーフォーム）
     otherLines.forEach(li => {
       const tr = document.createElement('tr');
       const tdDesc = document.createElement('td');
@@ -2036,6 +1230,7 @@
     applyAndRender();
   }
 
+  // ✅ 文書PDF生成関数（完全書き換え）
   async function saveAsPDF(){
     const seidNo = document.getElementById('seidNo').value.trim();
     if(!seidNo){
@@ -2045,49 +1240,182 @@
 
     const customer = document.getElementById('toBase').value.trim() || '顧客名未入力';
     const quoteNo = document.getElementById('quoteNo').value.trim() || 'DGNET';
-    
     const fileName = `${seidNo}_${quoteNo}_${customer.replace(/[\\/:*?"<>|]/g,'-')}`;
 
-    document.body.classList.add('pdf-mode');
-    
     try {
-      const paper = document.getElementById('paper');
-      const canvas = await html2canvas(paper, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+
+      // 日本語対応のため、デフォルトフォントを使用
+      // 完全な日本語対応には別途フォントファイルが必要
+
+      let yPos = 20;
+
+      // ヘッダー部分
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('MITUMORI-SHO (Quote)', 105, yPos, { align: 'center' });
+      yPos += 10;
+
+      // 基本情報
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      
+      const toName = document.getElementById('outToName').textContent;
+      const toAddr = document.getElementById('outToAddr').textContent;
+      const outQuoteNo = document.getElementById('outQuoteNo').textContent;
+      const outIssueDate = document.getElementById('outIssueDate').textContent;
+      const outSEID = document.getElementById('outSEID').textContent;
+      const outTantou = document.getElementById('outTantou').textContent;
+
+      doc.text(`To: ${toName}`, 20, yPos);
+      yPos += 5;
+      if(toAddr){
+        doc.text(`Address: ${toAddr}`, 20, yPos);
+        yPos += 5;
+      }
+      yPos += 3;
+
+      doc.text(`Quote No: ${outQuoteNo}`, 20, yPos);
+      doc.text(`Issue Date: ${outIssueDate}`, 110, yPos);
+      yPos += 5;
+      doc.text(`SEID: ${outSEID}`, 20, yPos);
+      doc.text(`Staff: ${outTantou}`, 110, yPos);
+      yPos += 10;
+
+      // 合計金額
+      const grandTotal = document.getElementById('outGrand').textContent;
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Total: ${grandTotal}`, 190, yPos, { align: 'right' });
+      yPos += 10;
+
+      // 納期・支払条件
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      const delivery = document.getElementById('outDelivery').textContent;
+      const payment = document.getElementById('outPayment').textContent;
+      const valid = document.getElementById('outValid').textContent;
+      doc.text(`Delivery: ${delivery}`, 20, yPos);
+      yPos += 4;
+      doc.text(`Payment: ${payment}`, 20, yPos);
+      yPos += 4;
+      doc.text(`Valid: ${valid}`, 20, yPos);
+      yPos += 8;
+
+      // 明細表（autoTable使用）
+      const tbody = document.getElementById('quoteTableBody');
+      const rows = tbody.querySelectorAll('tr');
+      const tableData = [];
+
+      rows.forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if(cells.length === 1){
+          // セクションヘッダー
+          tableData.push([{
+            content: cells[0].textContent,
+            colSpan: 4,
+            styles: { fillColor: [232, 232, 232], fontStyle: 'bold' }
+          }]);
+        } else if(cells.length === 4){
+          const rowData = [
+            cells[0].textContent, // 品名
+            cells[1].textContent, // 数量
+            cells[2].textContent, // 単価
+            cells[3].textContent  // 金額
+          ];
+
+          // 小計行の判定
+          if(tr.className.includes('section-subtotal')){
+            tableData.push([
+              { content: cells[0].textContent, colSpan: 3, styles: { halign: 'right', fontStyle: 'bold', fillColor: [245, 245, 245] } },
+              { content: cells[3].textContent, styles: { halign: 'right', fontStyle: 'bold', fillColor: [245, 245, 245] } }
+            ]);
+          } else {
+            tableData.push(rowData);
+          }
+        }
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      doc.autoTable({
+        startY: yPos,
+        head: [['Item', 'Qty', 'Unit Price', 'Amount']],
+        body: tableData,
+        styles: {
+          fontSize: 9,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [17, 17, 17],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { cellWidth: 90 },
+          1: { halign: 'center', cellWidth: 20 },
+          2: { halign: 'right', cellWidth: 40 },
+          3: { halign: 'right', cellWidth: 40 }
+        },
+        theme: 'grid'
+      });
 
-      if(imgHeight <= pdfHeight){
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      } else {
-        let heightLeft = imgHeight;
-        let position = 0;
-        
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
-        
-        while(heightLeft > 0){
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pdfHeight;
+      yPos = doc.lastAutoTable.finalY + 5;
+
+      // 合計セクション
+      const subtotal = document.getElementById('outSub').textContent;
+      const tax = document.getElementById('outTax').textContent;
+      const total = document.getElementById('outTotal').textContent;
+
+      doc.autoTable({
+        startY: yPos,
+        body: [
+          ['Subtotal', subtotal],
+          ['Tax (10%)', tax],
+          ['Total', total]
+        ],
+        theme: 'plain',
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+          fontStyle: 'bold'
+        },
+        columnStyles: {
+          0: { halign: 'right', cellWidth: 150 },
+          1: { halign: 'right', cellWidth: 40 }
         }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 8;
+
+      // 備考
+      const notes = document.getElementById('outNotes').textContent;
+      if(notes && notes !== '特記事項なし'){
+        doc.setFontSize(9);
+        doc.text('Notes:', 20, yPos);
+        yPos += 5;
+        const splitNotes = doc.splitTextToSize(notes, 170);
+        doc.text(splitNotes, 20, yPos);
+        yPos += splitNotes.length * 4 + 5;
       }
 
-      pdf.save(`${fileName}.pdf`);
-    } finally {
-      document.body.classList.remove('pdf-mode');
+      // フッター
+      yPos = Math.max(yPos, 250);
+      doc.setFontSize(8);
+      doc.text('SEIKEN Corporation', 20, yPos);
+      yPos += 4;
+      doc.text('Address: Osaka, Hirakata-shi', 20, yPos);
+      yPos += 4;
+      doc.text('TEL: 072-XXX-XXXX / Email: info@seiken.co.jp', 20, yPos);
+
+      // PDF保存
+      doc.save(`${fileName}.pdf`);
+
+      alert('PDF保存完了！ファイルサイズを確認してください。');
+
+    } catch(err){
+      alert('PDF生成エラー: ' + err.message);
+      console.error(err);
     }
   }
 
